@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">{{ survey.title }}</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% for question in survey.questions %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ loop.index }}. {{ question.text }}
+                    {% if question.is_required %}<span class="text-danger">*</span>{% endif %}
+                </h5>
+                <p>DEBUG: {{ question.type }}</p>
+                {% if question.type == QuestionType.TEXT %}
+                    <textarea name="q_{{ question.id }}"
+                        class="form-control"
+                        {% if question.is_required %}required{% endif %}></textarea>
+
+                {% elif question.type == QuestionType.FILE %}
+                    <input type="file"
+                           name="q_{{ question.id }}"
+                           class="form-control"
+                           {% if question.is_required %}required{% endif %}>
+
+                {% elif question.type in [QuestionType.SINGLE_CHOICE, QuestionType.MULTIPLE_CHOICE, QuestionType.LIMITED_CHOICE] %}
+                    <div class="list-group">
+                        {% for option in question.options %}
+                        <label class="list-group-item">
+                            {% if question.type == QuestionType.SINGLE_CHOICE %}
+                                <input type="radio"
+                                       name="q_{{ question.id }}"
+                                       value="{{ option.id }}"
+                                       {% if question.is_required %}required{% endif %}>
+                            {% else %}
+                                <input type="checkbox"
+                                       name="q_{{ question.id }}"
+                                       value="{{ option.id }}"
+                                       {% if question.choice_limit %}data-limit="{{ question.choice_limit }}"{% endif %}>
+                            {% endif %}
+                            {{ option.text }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary btn-lg">Отправить ответы</button>
+    </form>
+</div>
+
+<script>
+// Валидация лимита выборов
+document.querySelectorAll('[data-limit]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const limit = parseInt(this.dataset.limit);
+        const checked = document.querySelectorAll(`input[name="${this.name}"]:checked`);
+        if (checked.length > limit) {
+            this.checked = false;
+            alert(`Можно выбрать не более ${limit} вариантов`);
+        }
+    });
+});
+</script>
+{% endblock %}

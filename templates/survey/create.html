@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Создание нового опроса</h2>
+    <form id="survey-form" method="POST">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Название опроса</label>
+                    <input type="text" name="survey_title" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Описание</label>
+                    <textarea name="survey_description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox"
+                           name="require_login"
+                           id="require_login"
+                           class="form-check-input"
+                           {{ 'checked' if survey and survey.require_login else '' }}>
+                    <label class="form-check-label" for="require_login">
+                        Требовать авторизацию для ответа
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div id="questions-container">
+            <!-- Здесь будут добавляться вопросы -->
+        </div>
+
+        <div class="d-flex gap-2 my-4">
+            <button type="button" class="btn btn-success" onclick="addQuestion()">
+                Добавить вопрос
+            </button>
+            <button type="submit" class="btn btn-primary">Сохранить опрос</button>
+        </div>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='survey-builder.js') }}"></script>
+{% endblock %}
