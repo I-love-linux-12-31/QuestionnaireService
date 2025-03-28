@@ -12,6 +12,16 @@
         </div>
     </div>
 
+    <div>
+        <a type="button" class="btn btn-primary" href="{{ request.url }}/take">Пройти</a>
+        <a type="button" class="btn btn-info" href="{{ request.url }}/take">Копировать ссылку</a>
+
+        {% if is_owner %}
+            <a type="button" class="btn btn-warning" href="{{ request.url }}/edit">Редактировать</a>
+            <a type="button" class="btn btn-danger" href="{{ request.url }}/delete">Удалить</a>
+        {% endif %}
+    </div>
+
     {% for question in survey.questions %}
     <div class="card mb-3">
         <div class="card-header">

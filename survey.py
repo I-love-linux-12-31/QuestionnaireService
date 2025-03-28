@@ -77,7 +77,10 @@ def create():
 def view(id):
     db_session = create_session()
     survey = db_session.query(Survey).get(id)
-    return render_template('survey/view.html', survey=survey)
+    is_owner = False
+    if current_user.is_authenticated:
+        is_owner = survey.author_id == current_user.id
+    return render_template('survey/view.html', survey=survey, is_owner=is_owner)
 
 @survey_bp.route('/my')
 @login_required
@@ -99,6 +102,7 @@ def edit(id):
 
     if not survey or survey.author_id != current_user.id:
         # abort(403)
+        db_session.close()
         return 403
 
     if request.method == 'POST':
@@ -237,3 +241,22 @@ def take_survey(id):
             flash(f'Ошибка: {str(e)}', 'danger')
 
     return render_template('survey/take.html', survey=survey, QuestionType=QuestionType)
+
+
+@survey_bp.route('/<int:survey_id>/delete', methods=['GET', 'POST'])
+@login_required
+def delete(survey_id):
+    db_session = create_session()
+    survey = db_session.query(Survey).get(survey_id)
+
+    if not survey or survey.author_id != current_user.id:
+        # abort(403)
+        db_session.close()
+        return 403
+
+    if survey:
+        db_session.delete(survey)
+        db_session.commit()
+    db_session.close()
+    # todo: confirmation page.
+    return redirect("/surveys/my")
