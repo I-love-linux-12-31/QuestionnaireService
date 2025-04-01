@@ -14,13 +14,19 @@
 
     <div>
         <a type="button" class="btn btn-primary" href="{{ request.url }}/take">Пройти</a>
-        <a type="button" class="btn btn-info" href="{{ request.url }}/take">Копировать ссылку</a>
+        <button type="button" class="btn btn-info" id="btn-copy-link">Копировать ссылку</button>
+
+        <script>
+            addCopyTextHandler(document.getElementById('btn-copy-link'), "{{ request.url }}/take");
+        </script>
 
         {% if is_owner %}
             <a type="button" class="btn btn-warning" href="{{ request.url }}/edit">Редактировать</a>
             <a type="button" class="btn btn-danger" href="{{ request.url }}/delete">Удалить</a>
         {% endif %}
+
     </div>
+    <br>
 
     {% for question in survey.questions %}
     <div class="card mb-3">
