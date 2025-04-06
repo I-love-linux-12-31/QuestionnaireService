@@ -3,7 +3,7 @@
 import os
 
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app  # , current_app
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, AnonymousUserMixin
 from werkzeug.utils import secure_filename
 
 from db import create_session
@@ -137,7 +137,7 @@ def take_survey(id):
     survey = db_session.query(Survey).get(id)
 
     # Проверка авторизации
-    if survey.require_login and not current_user.is_authenticated:
+    if survey.require_login and isinstance(current_user, AnonymousUserMixin):
         return redirect(url_for('auth.login', next=request.url))
 
     # Проверка предыдущих ответов
