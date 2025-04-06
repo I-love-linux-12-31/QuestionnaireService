@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, DateTime, Enum
+from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, DateTime, Enum, VARCHAR
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from db import SqlAlchemyBase
@@ -20,10 +20,11 @@ class User(SqlAlchemyBase, UserMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    username = Column(String(64), unique=True)
-    email = Column(String(120), unique=True)
-    password_hash = Column(String(128))
-    created_at = Column(DateTime, default=datetime.utcnow)
+    username = Column(VARCHAR(64), unique=True)
+    email = Column(VARCHAR(120), unique=True)
+    password_hash = Column(VARCHAR(162))
+    created_at = Column(DateTime, default=datetime.now)
+    is_admin = Column(Boolean, default=False)
     surveys = relationship('Survey', backref='author')
 
 
@@ -31,7 +32,7 @@ class Survey(SqlAlchemyBase):
     __tablename__ = 'surveys'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String(100))
+    title = Column(VARCHAR(100))
     description = Column(Text)
     author_id = Column(Integer, ForeignKey('users.id'))
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -46,7 +47,7 @@ class Question(SqlAlchemyBase):
     id = Column(Integer, primary_key=True)
     survey_id = Column(Integer, ForeignKey('surveys.id'))
     type = Column(Enum(QuestionType))
-    text = Column(String(500))
+    text = Column(VARCHAR(500))
     is_required = Column(Boolean, default=False)
     choice_limit = Column(Integer, nullable=True)
     options = relationship('Option', backref='question')
@@ -57,7 +58,7 @@ class Option(SqlAlchemyBase):
 
     id = Column(Integer, primary_key=True)
     question_id = Column(Integer, ForeignKey('questions.id'))
-    text = Column(String(200))
+    text = Column(VARCHAR(200))
 
 
 class Answer(SqlAlchemyBase):
@@ -67,15 +68,15 @@ class Answer(SqlAlchemyBase):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     question_id = Column(Integer, ForeignKey('questions.id'))
     text_response = Column(Text, nullable=True)
-    file_path = Column(String(300), nullable=True)
+    file_path = Column(VARCHAR(300), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    ip_address = Column(String(46))
-    user_agent = Column(String(200))
-    browser = Column(String(200))
-    device_type = Column(String(50))
-    os = Column(String(50))
-    language = Column(String(10))
-    timezone = Column(String(50))
+    ip_address = Column(VARCHAR(46))
+    user_agent = Column(VARCHAR(200))
+    browser = Column(VARCHAR(200))
+    device_type = Column(VARCHAR(50))
+    os = Column(VARCHAR(50))
+    language = Column(VARCHAR(10))
+    timezone = Column(VARCHAR(50))
     options = relationship('Option', secondary='answer_options')
 
 
