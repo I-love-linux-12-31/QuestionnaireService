@@ -17,11 +17,13 @@ from user_agents import parse
 
 from survey import survey_bp
 from auth import auth_bp
+from api import api_bp
 
 app = Flask(__name__)
 app.secret_key = hashlib.sha256(os.urandom(24)).hexdigest()
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(survey_bp)
+app.register_blueprint(api_bp, url_prefix='/api')
 
 
 login_manager = LoginManager(app)
