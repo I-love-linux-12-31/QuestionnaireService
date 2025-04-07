@@ -4,5 +4,7 @@ SQLAlchemy
 PyYAML
 user-agents
 Werkzeug
-dotenv
+python-dotenv
 flask_swagger_ui
+flask_jwt_extended
+marshmallow
