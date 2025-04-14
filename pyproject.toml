@@ -1,0 +1,15 @@
+[tool.ruff]
+exclude = [
+    ".venv",
+    "venv",
+    "static",
+    "ORM/__all_models.py",
+]
+
+line-length = 121
+
+# select = ["ALL"]
+lint.select = ["W", "E", "Q", "COM"]
+
+[tool.ruff.lint.per-file-ignores]
+"db.py" = ["F401", "E501"]
