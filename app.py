@@ -23,36 +23,36 @@ from api import api_bp
 
 app = Flask(__name__)
 app.secret_key = hashlib.sha256(os.urandom(24)).hexdigest()
-app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(survey_bp)
-app.register_blueprint(api_bp, url_prefix='/api')
+app.register_blueprint(api_bp, url_prefix="/api")
 
 # Swagger configuration
-SWAGGER_URL = '/api/docs'  # URL for exposing Swagger UI
-API_URL = '/static/swagger.json'  # Our API url (can of course be a local resource)
+SWAGGER_URL = "/api/docs"  # URL for exposing Swagger UI
+API_URL = "/static/swagger.json"  # Our API url (can of course be a local resource)
 
 # Call factory function to create our blueprint
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={  # Swagger UI config overrides
-        'app_name': "Questionnaire Service API"
-    }
+        "app_name": "Questionnaire Service API",
+    },
 )
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # JWT Configuration
-JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', hashlib.sha256(os.urandom(24)).hexdigest())
-app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", hashlib.sha256(os.urandom(24)).hexdigest())
+app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 print(F"JWT_SECRET_KEY: {JWT_SECRET_KEY}")
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=30)
 jwt = JWTManager(app)
 
 login_manager = LoginManager(app)
-login_manager.login_view = 'auth.login'
+login_manager.login_view = "auth.login"
 
-app.config['UPLOAD_FOLDER'] = files.UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = files.UPLOAD_FOLDER
 
 
 @login_manager.user_loader
@@ -67,25 +67,25 @@ def shutdown_session(exception=None):
     pass
 
 # Главная страница
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-@app.route('/survey/<int:id>/submit', methods=['POST'])
+@app.route("/survey/<int:id>/submit", methods=["POST"])
 def submit_survey(id):
     ua = parse(request.user_agent.string)
-    
+
     # Try to get user_id from JWT if available
     user_id = None
     try:
         verify_jwt_in_request(optional=True)
         user_id = get_jwt_identity()
-    except:
+    except Exception as e:
         # If JWT is not available, check if user is logged in through flask-login
         if current_user.is_authenticated:
             user_id = current_user.id
-    
+
     answer = Answer(
         user_id=user_id,
         ip_address=request.remote_addr,
@@ -94,12 +94,12 @@ def submit_survey(id):
         os=ua.os.family,
         browser=ua.browser.family,
         language=request.accept_languages.best,
-        timezone=request.form.get('timezone', request.json.get('timezone') if request.is_json else None)
+        timezone=request.form.get("timezone", request.json.get("timezone") if request.is_json else None),
     )
     # ... обработка ответов
 
 
-@app.route('/survey/<int:id>/stats')
+@app.route("/survey/<int:id>/stats")
 @login_required
 def survey_stats(id):
     db_session = create_session()
@@ -108,17 +108,17 @@ def survey_stats(id):
     stats = []
     for question in survey.questions:
         stat = {
-            'question': question,
-            'answers_count': len(question.answers)
+            "question": question,
+            "answers_count": len(question.answers),
         }
         # ... специфическая логика для каждого типа вопроса
         stats.append(stat)
 
-    return render_template('stats.html', stats=stats)
+    return render_template("stats.html", stats=stats)
 
 
 # Инициализация БД
 global_init()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
