@@ -1,0 +1,24 @@
+# .github/workflows/main.yml
+name: Main workflow
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: fedora-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13t" # Free threaded Python 3.13
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip 
+        pip install ruff==0.8.0
+    - name: Lint with ruff
+      run: python -m ruff check
