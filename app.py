@@ -1,3 +1,7 @@
+#
+"""
+Main file. App entry point.
+"""
 import hashlib
 import os
 import datetime

@@ -1,5 +1,7 @@
 # survey.py
-
+"""
+Surveys module
+"""
 import os
 
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app  # , current_app
