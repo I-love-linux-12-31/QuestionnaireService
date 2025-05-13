@@ -1,7 +1,20 @@
 # Questionnaire Service
 **[README on Russian 🇷🇺](https://github.com/I-love-linux-12-31/QuestionnaireService/blob/master/docs/README_RU.md)**
+## About project:
+Web-app for online surveys.
+
+## Docs generation
+
+To setup docs using doxygen run:
+```bash
+doxygen
+# To open documentation
+xdg-open ./docs/html/index.html
+```
 
 ## API Documentation
+
+
 
 ### Authentication
 
