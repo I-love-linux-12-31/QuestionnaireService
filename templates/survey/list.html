@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="my-4">Мои опросы</h2>
+    <h2 class="my-4">My Surveys</h2>
     <div class="list-group">
         {% for survey in surveys %}
         <div class="list-group-item">
@@ -10,20 +10,20 @@
                 <div>
                     <h5>{{ survey.title }}</h5>
                     <small class="text-muted">
-                        Создан: {{ survey.created_at.strftime('%d.%m.%Y %H:%M') }}
-                        • Ответов: {{ survey.answers|length }}
+                        Created: {{ survey.created_at.strftime('%d.%m.%Y %H:%M') }}
+                        • Responses: {{ survey.answers|length }}
                     </small>
                 </div>
                 <div class="btn-group">
                     <a href="{{ url_for('survey.edit', id=survey.id) }}"
-                       class="btn btn-sm btn-outline-primary">Редактировать</a>
-                    <a href="{{ url_for('index', id=survey.id) }}"
-                       class="btn btn-sm btn-outline-info">Статистика</a> <!-- todo: survey.stats -->
+                       class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a href="{{ url_for('survey_stats', id=survey.id) }}"
+                       class="btn btn-sm btn-outline-info">Statistics</a>
                 </div>
             </div>
         </div>
         {% else %}
-        <div class="alert alert-info">У вас пока нет созданных опросов</div>
+        <div class="alert alert-info">You don't have any surveys yet</div>
         {% endfor %}
     </div>
 </div>

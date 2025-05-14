@@ -63,6 +63,7 @@ class Question(SqlAlchemyBase):
     is_required = Column(Boolean, default=False)
     choice_limit = Column(Integer, nullable=True)
     options = relationship("Option", backref="question")
+    answers = relationship("Answer", backref="question")
 
 
 class Option(SqlAlchemyBase):
