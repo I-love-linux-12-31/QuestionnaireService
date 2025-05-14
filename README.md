@@ -3,6 +3,15 @@
 ## About project:
 Web-app for online surveys.
 
+## Technologies:
+* python3
+* Flask
+* SQLAlchemy
+* sqlite3, mariadb, mysql (Different types of DB supported)
+* OpenAPI(swagger) + flask_swagger_ui
+* JS (For front-end)
+
+
 ## Docs generation
 
 To setup docs using doxygen run:
