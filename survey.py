@@ -117,7 +117,7 @@ def edit(id):
             # Delete old questions and their options
             for question in survey.questions:
                 db_session.delete(question)
-            
+
             # Add new questions (similar to create)
             question_index = 0
             while True:
@@ -289,7 +289,7 @@ def delete(survey_id):
     db_session = create_session()
     survey = db_session.query(Survey).filter(
         Survey.id == survey_id,
-        Survey.author_id == current_user.id
+        Survey.author_id == current_user.id,
     ).first()
 
     if not survey:
