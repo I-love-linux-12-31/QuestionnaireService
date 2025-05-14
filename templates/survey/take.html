@@ -48,19 +48,19 @@
         </div>
         {% endfor %}
 
-        <button type="submit" class="btn btn-primary btn-lg">Отправить ответы</button>
+        <button type="submit" class="btn btn-primary btn-lg">Submit Answers</button>
     </form>
 </div>
 
 <script>
-// Валидация лимита выборов
+// Validation for choice limits
 document.querySelectorAll('[data-limit]').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
         const limit = parseInt(this.dataset.limit);
         const checked = document.querySelectorAll(`input[name="${this.name}"]:checked`);
         if (checked.length > limit) {
             this.checked = false;
-            alert(`Можно выбрать не более ${limit} вариантов`);
+            alert(`You can select no more than ${limit} options`);
         }
     });
 });

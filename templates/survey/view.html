@@ -7,22 +7,22 @@
             <h1 class="card-title">{{ survey.title }}</h1>
             <p class="card-text">{{ survey.description }}</p>
             <div class="text-muted small">
-                Создано: {{ survey.created_at.strftime('%d.%m.%Y %H:%M') }}
+                Created: {{ survey.created_at.strftime('%d.%m.%Y %H:%M') }}
             </div>
         </div>
     </div>
 
     <div>
-        <a type="button" class="btn btn-primary" href="{{ request.url }}/take">Пройти</a>
-        <button type="button" class="btn btn-info" id="btn-copy-link">Копировать ссылку</button>
+        <a type="button" class="btn btn-primary" href="{{ request.url }}/take">Take Survey</a>
+        <button type="button" class="btn btn-info" id="btn-copy-link">Copy Link</button>
 
         <script>
             addCopyTextHandler(document.getElementById('btn-copy-link'), "{{ request.url }}/take");
         </script>
 
         {% if is_owner %}
-            <a type="button" class="btn btn-warning" href="{{ request.url }}/edit">Редактировать</a>
-            <a type="button" class="btn btn-danger" href="{{ request.url }}/delete">Удалить</a>
+            <a type="button" class="btn btn-warning" href="{{ request.url }}/edit">Edit</a>
+            <a type="button" class="btn btn-danger" href="{{ request.url }}/delete">Delete</a>
         {% endif %}
 
     </div>
@@ -33,7 +33,7 @@
         <div class="card-header">
             {{ loop.index }}. {{ question.text }}
             <span class="badge bg-secondary">{{ question.type.value }}</span>
-            {% if question.is_required %}<span class="badge bg-danger">Обязательный</span>{% endif %}
+            {% if question.is_required %}<span class="badge bg-danger">Required</span>{% endif %}
         </div>
         <div class="card-body">
             {% if question.options %}

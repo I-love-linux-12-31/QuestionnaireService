@@ -5,30 +5,30 @@ function addQuestion() {
     const questionHTML = `
         <div class="card mb-3 question-card" data-qid="${questionCounter}">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Вопрос #${questionCounter + 1}</h5>
+                <h5 class="mb-0">Question #${questionCounter + 1}</h5>
                 <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.question-card').remove()">
-                    Удалить
+                    Remove
                 </button>
             </div>
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label class="form-label">Текст вопроса</label>
+                        <label class="form-label">Question Text</label>
                         <input type="text" 
                                name="questions[${questionCounter}][text]" 
                                class="form-control" 
                                required>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Тип вопроса</label>
+                        <label class="form-label">Question Type</label>
                         <select name="questions[${questionCounter}][type]" 
                                 class="form-select question-type" 
                                 onchange="updateQuestionOptions(${questionCounter})">
-                            <option value="text">Текст</option>
-                            <option value="single_choice">Один вариант</option>
-                            <option value="multiple_choice">Несколько вариантов</option>
-                            <option value="limited_choice">Лимитированный выбор</option>
-                            <option value="file">Файл</option>
+                            <option value="text">Text</option>
+                            <option value="single_choice">Single Choice</option>
+                            <option value="multiple_choice">Multiple Choice</option>
+                            <option value="limited_choice">Limited Choice</option>
+                            <option value="file">File</option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -37,13 +37,13 @@ function addQuestion() {
                                    name="questions[${questionCounter}][required]" 
                                    id="required-${questionCounter}" 
                                    class="form-check-input">
-                            <label class="form-check-label" for="required-${questionCounter}">Обязательный</label>
+                            <label class="form-check-label" for="required-${questionCounter}">Required</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="question-options" id="options-${questionCounter}">
-                    <!-- Здесь появятся варианты ответов -->
+                    <!-- Options will appear here -->
                 </div>
             </div>
         </div>
@@ -61,7 +61,7 @@ function updateQuestionOptions(qIndex) {
     if (['single_choice', 'multiple_choice', 'limited_choice'].includes(type)) {
         const optionsHTML = `
             <div class="mb-3">
-                <label class="form-label">Варианты ответов</label>
+                <label class="form-label">Answer Options</label>
                 <div class="options-list">
                     <div class="input-group mb-2">
                         <input type="text" 
@@ -77,7 +77,7 @@ function updateQuestionOptions(qIndex) {
             </div>
             ${type === 'limited_choice' ? `
             <div class="col-md-3">
-                <label class="form-label">Лимит выборов</label>
+                <label class="form-label">Choice Limit</label>
                 <input type="number" 
                        name="questions[${qIndex}][limit]" 
                        class="form-control" 

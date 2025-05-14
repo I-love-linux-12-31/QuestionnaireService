@@ -1,7 +1,47 @@
 # Questionnaire Service
 **[README on Russian 🇷🇺](https://github.com/I-love-linux-12-31/QuestionnaireService/blob/master/docs/README_RU.md)**
+## About project:
+Web-app for online surveys.
+
+## Technologies:
+* python3
+* Flask
+  * flask-login
+  * flask_jwt_extended
+  * flask_swagger_ui
+* SQLAlchemy
+* sqlite3, mariadb, mysql (Different types of DB supported)
+* OpenAPI(swagger) docs
+* JS (For front-end)
+* pytest (For automated testing)
+
+
+## Docs generation
+
+To setup docs using doxygen run:
+```bash
+doxygen
+# To open documentation
+xdg-open ./docs/html/index.html
+```
+
+## Tests
+
+To run automated tests:
+
+```bash
+# Run all tests
+python -m pytest tests/
+
+# Run with coverage report
+python -m pytest --cov=. tests/
+```
+
+See [Tests README](tests/README.md) for more details on testing.
 
 ## API Documentation
+
+
 
 ### Authentication
 

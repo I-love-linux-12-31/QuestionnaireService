@@ -7,6 +7,9 @@ import enum
 
 
 class QuestionType(enum.Enum):
+    """
+    Types of question for survey
+    """
     TEXT = "text"
     WORD = "word"
     STRING = "string"
@@ -17,6 +20,9 @@ class QuestionType(enum.Enum):
 
 
 class User(SqlAlchemyBase, UserMixin):
+    """
+    ORM Class of user
+    """
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
@@ -29,6 +35,9 @@ class User(SqlAlchemyBase, UserMixin):
 
 
 class Survey(SqlAlchemyBase):
+    """
+    ORM Class of survey
+    """
     __tablename__ = "surveys"
 
     id = Column(Integer, primary_key=True)
@@ -42,6 +51,9 @@ class Survey(SqlAlchemyBase):
 
 
 class Question(SqlAlchemyBase):
+    """
+    ORM Class of Question
+    """
     __tablename__ = "questions"
 
     id = Column(Integer, primary_key=True)
@@ -51,9 +63,13 @@ class Question(SqlAlchemyBase):
     is_required = Column(Boolean, default=False)
     choice_limit = Column(Integer, nullable=True)
     options = relationship("Option", backref="question")
+    answers = relationship("Answer", backref="question")
 
 
 class Option(SqlAlchemyBase):
+    """
+    ORM Class of option for question
+    """
     __tablename__ = "options"
 
     id = Column(Integer, primary_key=True)
@@ -62,6 +78,9 @@ class Option(SqlAlchemyBase):
 
 
 class Answer(SqlAlchemyBase):
+    """
+    ORM Class of answer
+    """
     __tablename__ = "answers"
 
     id = Column(Integer, primary_key=True)
@@ -81,6 +100,9 @@ class Answer(SqlAlchemyBase):
 
 
 class AnswerOption(SqlAlchemyBase):
+    """
+    ORM Class of option for answer
+    """
     __tablename__ = "answer_options"
 
     answer_id = Column(Integer, ForeignKey("answers.id"), primary_key=True)

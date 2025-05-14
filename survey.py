@@ -1,5 +1,7 @@
 # survey.py
-
+"""
+Surveys module
+"""
 import os
 
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app  # , current_app
@@ -23,16 +25,16 @@ def create():
 
     if request.method == "POST":
         try:
-            # Создаем опрос
+            # Create a survey
             new_survey = Survey(
                 title=request.form["survey_title"],
                 description=request.form["survey_description"],
                 author_id=current_user.id,
             )
             db_session.add(new_survey)
-            db_session.flush()  # Чтобы получить ID нового опроса
+            db_session.flush()  # To get the ID of the new survey
 
-            # Обрабатываем вопросы
+            # Process questions
             question_index = 0
             while True:
                 q_prefix = f"questions[{question_index}]"
@@ -46,7 +48,7 @@ def create():
                     survey_id=new_survey.id,
                 )
 
-                # Обработка вариантов ответов для типов с выбором
+                # Process answer options for choice types
                 if question.type in [QuestionType.SINGLE_CHOICE,
                                      QuestionType.MULTIPLE_CHOICE,
                                      QuestionType.LIMITED_CHOICE]:
@@ -55,7 +57,7 @@ def create():
                         if opt_text.strip():
                             question.options.append(Option(text=opt_text))
 
-                # Лимит выборов для LIMITED_CHOICE
+                # Choice limit for LIMITED_CHOICE
                 if question.type == QuestionType.LIMITED_CHOICE:
                     question.choice_limit = int(request.form.get(f"{q_prefix}[limit]", 1))
 
@@ -63,12 +65,12 @@ def create():
                 question_index += 1
 
             db_session.commit()
-            flash("Опрос успешно создан!", "success")
+            flash("Survey created successfully!", "success")
             return redirect(url_for("survey.view", id=new_survey.id))
 
         except Exception as e:
             db_session.rollback()
-            flash(f"Ошибка при создании опроса: {str(e)}", "danger")
+            flash(f"Error creating survey: {str(e)}", "danger")
 
     return render_template("survey/create.html")
 
@@ -103,30 +105,56 @@ def edit(id):
     if not survey or survey.author_id != current_user.id:
         # abort(403)
         db_session.close()
-        return 403
+        return "Access Denied", 403
 
     if request.method == "POST":
         try:
-            # Обновление основных данных
+            # Update basic data
             survey.title = request.form["survey_title"]
             survey.description = request.form["survey_description"]
             survey.require_login = "require_login" in request.form
 
-            # Удаляем старые вопросы
+            # Delete old questions and their options
             for question in survey.questions:
                 db_session.delete(question)
 
-            # todo
-            # Добавляем новые вопросы (аналогично create)
-            # ... (код обработки вопросов из предыдущего шага)
+            # Add new questions (similar to create)
+            question_index = 0
+            while True:
+                q_prefix = f"questions[{question_index}]"
+                if f"{q_prefix}[text]" not in request.form:
+                    break
+
+                question = Question(
+                    text=request.form[f"{q_prefix}[text]"],
+                    type=QuestionType(request.form[f"{q_prefix}[type]"]),
+                    is_required=bool(request.form.get(f"{q_prefix}[required]")),
+                    survey_id=survey.id,
+                )
+
+                # Process options for choice questions
+                if question.type in [QuestionType.SINGLE_CHOICE,
+                                     QuestionType.MULTIPLE_CHOICE,
+                                     QuestionType.LIMITED_CHOICE]:
+                    options = request.form.getlist(f"{q_prefix}[options][]")
+                    for opt_text in options:
+                        if opt_text.strip():
+                            question.options.append(Option(text=opt_text))
+
+                # Choice limit for LIMITED_CHOICE
+                if question.type == QuestionType.LIMITED_CHOICE:
+                    question.choice_limit = int(request.form.get(f"{q_prefix}[limit]", 1))
+
+                db_session.add(question)
+                question_index += 1
 
             db_session.commit()
-            flash("Опрос успешно обновлён", "success")
+            flash("Survey updated successfully", "success")
             return redirect(url_for("survey.view", id=id))
 
         except Exception as e:
             db_session.rollback()
-            flash(f"Ошибка: {str(e)}", "danger")
+            flash(f"Error: {str(e)}", "danger")
 
     return render_template("survey/create.html", survey=survey)
 
@@ -136,11 +164,11 @@ def take_survey(id):
     db_session = create_session()
     survey = db_session.query(Survey).get(id)
 
-    # Проверка авторизации
+    # Check authorization
     if survey.require_login and isinstance(current_user, AnonymousUserMixin):
         return redirect(url_for("auth.login", next=request.url))
 
-    # Проверка предыдущих ответов
+    # Check previous responses
     if current_user.is_authenticated:
         has_answered = (db_session.query(Answer)
                         .filter(Answer.user_id == current_user.id)
@@ -150,7 +178,7 @@ def take_survey(id):
                         )
 
     else:
-    # Проверка по IP (упрощённо)
+    # Check by IP (simplified)
         has_answered = db_session.query(
             Answer,
         ).filter(
@@ -158,12 +186,12 @@ def take_survey(id):
         ).join(Question).filter(Question.survey_id == id).first()
 
     if has_answered:
-        flash("Вы уже проходили этот опрос", "warning")
+        flash("You have already taken this survey", "warning")
         return redirect(url_for("survey.view", id=id))
 
     if request.method == "POST":
         try:
-            # Сбор метаданных
+            # Collect metadata
             ua = parse(request.user_agent.string)
             answer_data = {
                 "ip_address": request.remote_addr,
@@ -176,10 +204,10 @@ def take_survey(id):
                 "user_id": current_user.id if current_user.is_authenticated else None,
             }
 
-            # Обработка каждого вопроса
+            # Process each question
             print("DEBUG")
             print(request.form)
-            print("FIES")
+            print("FILES")
             print(request.files)
 
             for question in survey.questions:
@@ -195,9 +223,9 @@ def take_survey(id):
                         ))
                         answer.file_path = filename
                 else:
-                    # Обработка других типов вопросов
+                    # Process other question types
 
-                    # ... логика сохранения
+                    # ... save logic
 
                     if question.type in [
                         QuestionType.SINGLE_CHOICE,
@@ -243,12 +271,14 @@ def take_survey(id):
 
             db_session.commit()
 
-            flash("Спасибо за участие!", "success")
+            flash("Thank you for your participation!", "success")
             return redirect(url_for("survey.view", id=id))
 
         except Exception as e:
             db_session.rollback()
-            flash(f"Ошибка: {str(e)}", "danger")
+            print(e)
+            print(e.__class__.__name__, dir(e))
+            flash(f"Error: {str(e)}", "danger")
 
     return render_template("survey/take.html", survey=survey, QuestionType=QuestionType)
 
@@ -257,16 +287,19 @@ def take_survey(id):
 @login_required
 def delete(survey_id):
     db_session = create_session()
-    survey = db_session.query(Survey).get(survey_id)
+    survey = db_session.query(Survey).filter(
+        Survey.id == survey_id,
+        Survey.author_id == current_user.id,
+    ).first()
 
-    if not survey or survey.author_id != current_user.id:
-        # abort(403)
+    if not survey:
         db_session.close()
-        return 403
+        return redirect(url_for("survey.user_surveys"))
 
-    if survey:
+    if request.method == "POST":
         db_session.delete(survey)
         db_session.commit()
-    db_session.close()
-    # todo: confirmation page.
-    return redirect("/surveys/my")
+        flash("Survey deleted", "success")
+        return redirect(url_for("survey.user_surveys"))
+
+    return render_template("survey/delete.html", survey=survey)

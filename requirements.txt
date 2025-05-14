@@ -8,3 +8,5 @@ python-dotenv
 flask_swagger_ui
 flask_jwt_extended
 marshmallow
+pytest
+pytest-cov
