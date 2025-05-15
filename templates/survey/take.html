@@ -12,7 +12,7 @@
                     {{ loop.index }}. {{ question.text }}
                     {% if question.is_required %}<span class="text-danger">*</span>{% endif %}
                 </h5>
-                <p>DEBUG: {{ question.type }}</p>
+                {#<p>DEBUG: {{ question.type }}</p>#}
                 {% if question.type == QuestionType.TEXT %}
                     <textarea name="q_{{ question.id }}"
                         class="form-control"
