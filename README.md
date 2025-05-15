@@ -3,6 +3,49 @@
 ## About project:
 Web-app for online surveys.
 
+## How to launch
+
+Example of .env file:
+```dotenv
+# Database Configuration
+# MariaDB/MySQL
+# DB_TYPE=mariadb+pymysql
+# DB_USER=questionnaire_user
+# DB_PASSWORD=questionnaire_password
+# DB_SERVER=mariadb
+# DB_PORT=3306
+# DB=questionnaire_db
+
+# Sqlite3
+DB="QuestionnaireService"
+DB_TYPE="sqlite3"
+
+# Application Configuration
+SECRET_KEY=your_secret_key_here
+JWT_SECRET_KEY=your_jwt_secret_key_here
+
+# Development Settings
+FLASK_APP=app.py
+FLASK_ENV=development
+FLASK_DEBUG=1
+FLASK_RUN_HOST=0.0.0.0
+FLASK_RUN_PORT=5000
+
+```
+
+### dev-mode
+
+```bash
+# Create .env file first!
+DOTENV=1 python3 app.py
+```
+
+### docker
+
+```bash
+docker-compose up
+```
+
 ## Technologies:
 * python3
 * Flask
@@ -120,5 +163,4 @@ Response:
 - Users can only access their own answers
 - Survey authors can read answers to their surveys, but cannot modify them
 - Admins have full access to all data
-
 
