@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">{{ survey.title }} - Statistics</h1>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Survey Overview</h5>
+            <p class="card-text">{{ survey.description }}</p>
+            <p><strong>Total Responses:</strong> {{ survey_meta.total_responses }}</p>
+            <p><strong>Created:</strong> {{ survey.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+            <a href="{{ url_for('survey.view', id=survey.id) }}" class="btn btn-primary">View Survey</a>
+        </div>
+    </div>
+
+    <!-- Respondent Demographics -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Demographics</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>Browsers</h6>
+                    <ul class="list-group">
+                        {% for browser, count in survey_meta.browsers.items() %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ browser }}
+                            <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Operating Systems</h6>
+                    <ul class="list-group">
+                        {% for os, count in survey_meta.operating_systems.items() %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ os }}
+                            <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Devices</h6>
+                    <ul class="list-group">
+                        {% for device, count in survey_meta.devices.items() %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ device }}
+                            <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions and their statistics -->
+    {% for stat in stats %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Question {{ loop.index }}: {{ stat.question.text }}</h5>
+            <div class="d-flex justify-content-between">
+                <span class="badge bg-secondary">{{ stat.question.type.value }}</span>
+                <span>Responses: {{ stat.answers_count }} ({{ stat.response_rate }})</span>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if stat.question.type.value in ['single_choice', 'multiple_choice', 'limited_choice'] %}
+                <!-- Chart for choice questions -->
+                <div class="mb-3" style="height: 300px;">
+                    <canvas id="chart-q{{ stat.question.id }}"></canvas>
+                </div>
+                
+                <!-- Table with detailed statistics -->
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Option</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for option_stat in stat.option_stats %}
+                        <tr>
+                            <td>{{ option_stat.option }}</td>
+                            <td>{{ option_stat.count }}</td>
+                            <td>{{ option_stat.percentage }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% elif stat.question.type.value == 'text' %}
+                <div>
+                    <p><strong>Average Answer Length:</strong> {{ stat.text_stats.avg_length }} characters</p>
+                    <h6>Responses:</h6>
+                    <div class="list-group">
+                        {% for response in stat.text_stats.responses %}
+                        <div class="list-group-item">{{ response }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% elif stat.question.type.value == 'file' %}
+                <div>
+                    <h6>File Types:</h6>
+                    <ul>
+                        {% for ext, count in stat.file_stats.file_types.items() %}
+                        <li>{{ ext or 'No extension' }}: {{ count }}</li>
+                        {% endfor %}
+                    </ul>
+                    <h6>Uploaded Files:</h6>
+                    <div class="list-group">
+                        {% for path in stat.file_stats.file_paths %}
+                        <div class="list-group-item">
+                            <a href="{{ url_for('static', filename='uploads/' + path) }}" target="_blank">{{ path }}</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Include Chart.js for visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Generate charts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% for stat in stats %}
+        {% if stat.question.type.value in ['single_choice', 'multiple_choice', 'limited_choice'] %}
+            var ctx{{ stat.question.id }} = document.getElementById('chart-q{{ stat.question.id }}').getContext('2d');
+            var labels{{ stat.question.id }} = {{ stat.chart_labels|safe }};
+            var values{{ stat.question.id }} = {{ stat.chart_values|safe }};
+            
+            new Chart(ctx{{ stat.question.id }}, {
+                type: 'bar',
+                data: {
+                    labels: labels{{ stat.question.id }},
+                    datasets: [{
+                        label: 'Responses',
+                        data: values{{ stat.question.id }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        {% endif %}
+    {% endfor %}
+});
+</script>
+{% endblock %} 

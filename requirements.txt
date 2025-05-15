@@ -8,5 +8,8 @@ python-dotenv
 flask_swagger_ui
 flask_jwt_extended
 marshmallow
+
+pymysql
+
 pytest
 pytest-cov
